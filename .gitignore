@@ -1,0 +1,4 @@
+.idea/
+venv/
+dist/
+django_googleauth.egg-info/
