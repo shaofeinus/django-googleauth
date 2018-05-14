@@ -3,7 +3,6 @@ import logging
 from django.contrib.auth.models import User
 
 from googleauth.models import GoogleCreds
-from sheets import services
 
 
 class GoogleAuthBackend:
@@ -35,11 +34,6 @@ class GoogleAuthBackend:
             user.save()
             # Create corresponding google credentials
             GoogleCreds(user=user, credentials=credentials).save()
-            # Create corresponding sheets meta info
-            meta_spreadsheet, error_status = services.create_meta_spreadsheet(user)
-            if error_status is not None:
-                logging.error('Error status {} when trying to create meta spreadsheet'.format(error_status))
-                return None
         return user
 
     def get_user(self, user_id):
