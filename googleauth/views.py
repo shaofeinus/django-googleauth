@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
-from . import GOOGLEAUTH_SUCCESS_VIEW, GOOGLEAUTH_ERROR_VIEW
+from .configs import GOOGLEAUTH_SUCCESS_VIEW, GOOGLEAUTH_ERROR_VIEW
 
 logger = logging.getLogger(__name__)
 
