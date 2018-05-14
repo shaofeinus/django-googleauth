@@ -10,6 +10,8 @@ from django.views.decorators.http import require_GET
 
 from . import GOOGLEAUTH_SUCCESS_VIEW, GOOGLEAUTH_ERROR_VIEW
 
+logger = logging.getLogger(__name__)
+
 
 # Step 1 - Authenticate OAuth
 @require_GET
@@ -35,13 +37,13 @@ def auth_redirect(request):
     auth_error = request.GET.get('error')
     if auth_error is not None:
         error_message = 'Authentication error: {}'.format(auth_error)
-        logging.debug(error_message)
+        logger.info(error_message)
         return _redirect_to_auth_error(error_message, response_url)
     # Go back to login page if authentication code not found
     auth_code = request.GET.get('code')
     if auth_code is None:
         error_message = 'Authentication code not found'
-        logging.debug(error_message)
+        logger.info(error_message)
         return _redirect_to_auth_error(error_message, response_url)
     # Get credentials
     flow = _google_flow(request)

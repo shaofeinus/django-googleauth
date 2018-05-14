@@ -4,21 +4,23 @@ from django.contrib.auth.models import User
 
 from googleauth.models import GoogleCreds
 
+logger = logging.getLogger(__name__)
+
 
 class GoogleAuthBackend:
 
     def authenticate(self, request, email=None, credentials=None):
         if email is None:
-            logging.debug('No email')
+            logger.info('No email')
             return None
         if credentials is None:
-            logging.debug('No credentials')
+            logger.info('No credentials')
             return None
         if not credentials.valid:
-            logging.debug('Credentials not valid')
+            logger.info('Credentials not valid')
             return None
         if credentials.expired:
-            logging.debug('Credentials expired')
+            logger.info('Credentials expired')
             return None
         try:
             # Get user
@@ -29,7 +31,7 @@ class GoogleAuthBackend:
             goog_creds.save(update_fields=['credentials'])
         except User.DoesNotExist:
             # Create user if does not exist
-            logging.debug('Creating new user {}'.format(email))
+            logger.debug('Creating new user {}'.format(email))
             user = User(username=email, email=email)
             user.save()
             # Create corresponding google credentials
