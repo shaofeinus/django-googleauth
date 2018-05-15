@@ -48,18 +48,20 @@ settings.py
 
 **Optional:**
 
-1. Set default login success view name as `GOOGLEAUTH_SUCCESS_VIEW`::
+1. Set default login success template as `GOOGLEAUTH_AUTH_SUCCESS_TEMPLATE`::
 
-    GOOGLEAUTH_SUCCESS_VIEW = 'login-success-view-name'
+    GOOGLEAUTH_AUTH_SUCCESS_TEMPLATE = 'app/login_success_template.html'
 
-   If this view is not set, a simple login success page will be shown.
+   No context variables are available to be used in the template.
+   If this template is not set, a default login success page will be shown (googleauth/auth_success.html).
 
-2. Set default login error view name as `GOOGLEAUTH_ERROR_VIEW`::
+2. Set default login error template as `GOOGLEAUTH_AUTH_ERROR_TEMPLATE`::
 
-    GOOGLEAUTH_ERROR_VIEW = 'login-error-view-name'
+    GOOGLEAUTH_AUTH_ERROR_TEMPLATE = 'app/login_error_template.html'
 
-   The `error_message` and `response_url` query string is available in the `request.GET` parameter of the view function.
-   If this view is not set, a simple login success page will be shown.
+   The `error_message` and `response_url` context variables are available to be used in the template.
+   If this template is not set, a simple login error page will be shown (googleauth/auth_error.html).
+
 
 urls.py
 ^^^^^^^

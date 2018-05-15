@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
-from .configs import GOOGLEAUTH_SUCCESS_VIEW, GOOGLEAUTH_ERROR_VIEW
+from .configs import AUTH_SUCCESS_TEMPLATE, AUTH_ERROR_TEMPLATE
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 # Step 1 - Authenticate OAuth
 @require_GET
 def auth(request):
-    next_url = request.GET.get('next', reverse(GOOGLEAUTH_SUCCESS_VIEW))
+    next_url = request.GET.get('next', reverse('googleauth-auth-success'))
     if request.user.is_authenticated:
         # User already logged in, redirect to next url
         return redirect(next_url)
@@ -33,21 +33,21 @@ def auth(request):
 @require_GET
 def auth_redirect(request):
     response_url = request.get_full_path()
-    # Go back to login page if authentication failed
-    auth_error = request.GET.get('error')
-    if auth_error is not None:
-        error_message = 'Authentication error: {}'.format(auth_error)
+    error = request.GET.get('error')
+    code = request.GET.get('code')
+    if error is not None:
+        # Go to error page if authentication failed
+        error_message = 'Authentication error: {}'.format(error)
         logger.info(error_message)
         return _redirect_to_auth_error(error_message, response_url)
-    # Go back to login page if authentication code not found
-    auth_code = request.GET.get('code')
-    if auth_code is None:
+    if code is None:
+        # Go to error page if authentication code not found
         error_message = 'Authentication code not found'
         logger.info(error_message)
         return _redirect_to_auth_error(error_message, response_url)
     # Get credentials
     flow = _google_flow(request)
-    flow.fetch_token(code=auth_code)
+    flow.fetch_token(code=code)
     credentials = flow.credentials
     # Get user email
     service = googleapiclient.discovery.build('plus', 'v1', credentials=credentials)
@@ -65,19 +65,17 @@ def auth_redirect(request):
         return _redirect_to_auth_error(error_message, response_url)
 
 
-# Default authentication success page
-# Override view with GOOGLEAUTH_SUCCESS_VIEW in settings.py
+# Authentication success page
 @require_GET
 def auth_success(request):
-    return render(request, 'googleauth/auth_success.html', {})
+    return render(request, AUTH_SUCCESS_TEMPLATE, {})
 
 
-# Default authentication error page
-# Override view with GOOGLEAUTH_ERROR_VIEW in settings.py
+# Authentication error page
 @require_GET
 def auth_error(request):
     return render(
-        request, 'googleauth/auth_error.html',
+        request, AUTH_ERROR_TEMPLATE,
         {
             'error_message': request.GET.get('error_message', 'Unknown error'),
             'response_url': request.GET.get('response_url')
@@ -87,7 +85,7 @@ def auth_error(request):
 def _redirect_to_auth_error(error_message, response_url):
     return redirect(
         '{}?error_message={}&response_url={}'.format(
-            reverse(GOOGLEAUTH_ERROR_VIEW),
+            reverse('googleauth-auth-error'),
             error_message,
             response_url))
 

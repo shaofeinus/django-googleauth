@@ -2,7 +2,7 @@ import logging
 
 from django.contrib.auth.models import User
 
-from googleauth.models import GoogleCreds
+from .models import GoogleCreds
 
 logger = logging.getLogger(__name__)
 
